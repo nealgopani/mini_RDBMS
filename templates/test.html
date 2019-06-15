@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<style>
+    h1, body{text-align:center}
+    table, th, td{border: 2px solid black;
+      border-collapse: collapse;
+    padding: 15px;
+    }
+
+    .edit{background-color:cornflowerblue;
+            color: white;
+            padding: 1px 10px;
+            height: 20px;
+    		width: 40px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 10px;
+            margin: 4px 2px;
+            cursor: pointer;}
+    .delete{background-color:red;
+      color: white;
+      padding: 1px 10px;
+      text-align: center;
+      text-decoration: none;
+      height: 20px;
+      width: 40px;
+      display: inline-block;
+      font-size: 10px;
+      margin: 4px 2px;
+      cursor: pointer;}
+    .add{background-color:green;
+      color: white;
+      padding: 1px 10px;
+      text-align: center;
+      height: 20px;
+      width: 40px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 10px;
+      margin: 4px 2px;
+      cursor: pointer;}
+    .save{background-color:black;
+      color: white;
+      padding: 1px 10px;
+      height: 20px;
+    	width: 40px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 10px;
+      margin: 4px 2px;
+      cursor: pointer;}
+    #table {
+    	width: 100%;
+    	align: "center";
+    }
+
+  </style>
+<head>
+	<title>PSUEDO DBMS USING REST API</title>
+	<script>
+
+	function edit_row(no)
+	{
+	  document.getElementById("edit_button"+no).style.display="none";
+	  document.getElementById("save_button"+no).style.display="block";
+
+	  var actorid=document.getElementById("actorid_row"+no);
+	  var firstname=document.getElementById("firstname_row"+no);
+	  var lastname=document.getElementById("lastname_row"+no);
+	  var lastupdate=document.getElementById("lastupdate_row"+no);
+
+	  var actorid_data=actorid.innerHTML;
+	  var firstname_data=firstname.innerHTML;
+	  var lastname_data=lastname.innerHTML;
+	  var lastupdate_data=lastupdate.innerHTML;
+
+	  actorid.innerHTML="<input type='text' id='actorid_text"+no+"' value='"+actorid_data+"'>";
+	  firstname.innerHTML="<input type='text' id='firstname_text"+no+"' value='"+firstname_data+"'>";
+	  lastname.innerHTML="<input type='text' id='lastname_text"+no+"' value='"+lastname_data+"'>";
+	  lastupdate.innerHTML="<input type='text' id='lastupdate_text"+no+"' value='"+lastupdate_data+"'>";
+	}
+
+	function save_row(no)
+	{
+	  var actorid_val=document.getElementById("actorid_text"+no).value;
+	  var firstname_val=document.getElementById("firstname_text"+no).value;
+	  var lastname_val=document.getElementById("lastname_text"+no).value;
+	  var
+	  lastupdate_val=document.getElementById("lastupdate_text"+no).value;
+
+
+
+
+	  document.getElementById("actorid_row"+no).innerHTML=actorid_val;
+	  document.getElementById("firstname_row"+no).innerHTML=firstname_val;
+	  document.getElementById("lastname_row"+no).innerHTML=lastname_val;
+	  document.getElementById("lastupdate_row"+no).innerHTML=lastupdate_val;
+
+	  var json = {"actor_id": actorid_val, "first_name": firstname_val, "last_name": lastname_val, "last_update": lastupdate_val};
+	  httpRequest = new XMLHttpRequest();
+	  if (!httpRequest) {
+	     alert('Giving up :( Cannot create an XMLHTTP instance');
+	     return false;
+      }
+	    httpRequest.open('PUT', 'http://127.0.0.1:5000/actor', true);
+	    httpRequest.setRequestHeader("Content-Type", "application/json");
+		httpRequest.send(JSON.stringify(json));
+
+
+	  document.getElementById("edit_button"+no).style.display="block";
+	  document.getElementById("save_button"+no).style.display="none";
+	}
+
+	function delete_row(no)
+	{
+		httpRequest = new XMLHttpRequest();
+	  if (!httpRequest) {
+	     alert('Giving up :( Cannot create an XMLHTTP instance');
+	     return false;
+      }
+      	var json = {"actor_id": document.getElementById("actorid_row"+""+no+"").innerHTML};
+	    httpRequest.open('DELETE', 'http://127.0.0.1:5000/actor', true);
+	    httpRequest.setRequestHeader("Content-Type", "application/json");
+		httpRequest.send(JSON.stringify(json));
+		
+	  	document.getElementById("row"+no+"").outerHTML="";
+
+	}
+
+	function add_row()
+	{
+	  var new_actorid=document.getElementById("new_actorid").value;
+	  var new_firstname=document.getElementById("new_firstname").value;
+	  var new_lastname=document.getElementById("new_lastname").value;
+	  new_lastupdate=document.getElementById("new_lastupdate").value;
+
+	  var table=document.getElementById("table");
+	  var table_len=(table.rows.length)-1;
+	  var row = table.insertRow(table_len).outerHTML="<tr id='row"+table_len+"'><td id='actorid_row"+table_len+"'>"+new_actorid+"</td><td id='firstname_row"+table_len+"'>"+new_firstname+"</td><td id='lastname_row"+table_len+"'>"+new_lastname+"</td><td id='lastupdate_row"+table_len+"'>"+new_lastupdate+"</td><td><input type='button' id='edit_button"+table_len+"' value='Edit' class='edit' onclick='edit_row("+table_len+")'> <input type='button' id='save_button"+table_len+"' value='Save' class='save' onclick='save_row("+table_len+")'> <input type='button' value='Delete' class='delete' onclick='delete_row("+table_len+")'></td></tr>";
+
+	  document.getElementById("new_actorid").value="";
+	  document.getElementById("new_firstname").value="";
+	  document.getElementById("new_lastname").value="";
+	  document.getElementById("new_lastupdate").value="";
+
+	  var date = new Date();
+	  var timestamp = date.getTime();
+
+	  var json = {"actor_id": new_actorid, "first_name": new_firstname, "last_name": new_lastname, "last_update": new_lastupdate};
+	  httpRequest = new XMLHttpRequest();
+	  if (!httpRequest) {
+	     alert('Giving up :( Cannot create an XMLHTTP instance');
+	     return false;
+      }
+	    httpRequest.open('POST', 'http://127.0.0.1:5000/actor', true);
+	    httpRequest.setRequestHeader("Content-Type", "application/json");
+		httpRequest.send(JSON.stringify(json));
+	}
+	</script>
+</head>
+<body>
+	<h1>
+    <strong>PSUEDO DBMS USING REST API</strong>
+  	</h1>
+    <hr><br>
+	<button id="actorButton" type="button">DISPLAY ACTOR TABLE</button>
+	<script>
+	(function() {
+	  var httpRequest;
+	  document.getElementById("actorButton").addEventListener('click', makeRequest);
+
+	  function makeRequest() {
+	    httpRequest = new XMLHttpRequest();
+
+	    if (!httpRequest) {
+	      alert('Giving up :( Cannot create an XMLHTTP instance');
+	      return false;
+	    }
+	    httpRequest.onreadystatechange = alertContents;
+	    httpRequest.open('GET', 'http://127.0.0.1:5000/actor', true);
+	    httpRequest.send();
+	  }
+
+	  function insertFirstRow(tableRef) {
+	  	var columns = tableRef.insertRow();
+
+	    var id = columns.insertCell(0);
+	    var first_name = columns.insertCell(1);
+	    var last_name = columns.insertCell(2);
+	    var last_update = columns.insertCell(3);
+
+	    id.append("actor_id")
+	    first_name.append("first_name")
+	    last_name.append("last_name")
+	    last_update.append("last_update")
+	  }
+
+	  function createButtonEntry(cell, id) {
+	  	var edit_button = document.createElement('button');
+	  	edit_button.setAttribute('id', 'edit_button'+id);
+	  	edit_button.setAttribute('value', 'edit');
+	  	edit_button.setAttribute('class', 'edit');
+	  	edit_button.setAttribute('onclick', "edit_row("+id+")")
+	  	edit_button.innerHTML = "Edit";
+
+	  	var save_button = document.createElement('button');
+	  	save_button.setAttribute('id', 'save_button'+id);
+	  	save_button.setAttribute('value', 'save');
+	  	save_button.setAttribute('class', 'save');
+	  	save_button.setAttribute('onclick', "save_row("+id+")");
+	  	save_button.innerHTML = "save";
+
+	  	var delete_button = document.createElement('button');
+	  	delete_button.setAttribute('id', 'delete_button'+id);
+	  	delete_button.setAttribute('value', 'delete');
+	  	delete_button.setAttribute('class', 'delete');
+	  	delete_button.setAttribute('onclick', "delete_row("+id+")")
+	  	delete_button.innerHTML = "Delete";
+	  	
+	  	cell.append(edit_button);
+	  	cell.append(save_button);
+	  	cell.append(delete_button);
+
+	  }
+
+	  function createLastRow(table) {
+	  	var last = table.insertRow(-1);
+
+	  	var new_actorid = document.createElement('input');
+	  	var new_firstname = document.createElement('input');
+	  	var new_lastname = document.createElement('input');
+	  	var new_lastupdate = document.createElement('input');
+	  	var add_row = document.createElement('button');
+
+	  	var items = [new_actorid, new_firstname, new_lastname, new_lastupdate, add_row];
+
+	  	new_actorid.setAttribute('id', 'new_actorid');
+	  	new_firstname.setAttribute('id', 'new_firstname');
+	  	new_lastname.setAttribute('id', 'new_lastname');
+	  	new_lastupdate.setAttribute('id', 'new_lastupdate');
+
+
+	  	add_row.setAttribute('value', 'Add Row');
+	  	add_row.setAttribute('class', 'add');
+	  	add_row.setAttribute('onclick', "add_row()")
+	  	add_row.innerHTML = "Add Row";
+
+	  	for (i in items) {
+	  		if (i != 4) {
+	  			items[i].type = "text";
+	  		}
+
+	  		var newCell = last.insertCell(i);
+	  		newCell.append(items[i]);
+	  	}
+
+
+	  }
+
+	  function alertContents() {
+	    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+	      if (httpRequest.status === 200) {
+	      	var tableRef = document.createElement('table');
+	      	tableRef.setAttribute('id', 'table');
+	      	tableRef.setAttribute('align', 'center');
+	      	insertFirstRow(tableRef);
+
+	      	
+	      	var jsonObj = JSON.parse(httpRequest.responseText);
+	      	var newCell;
+	      	var newText;
+	      	var id = 1;
+	      	var columns = ['actorid_row', 'firstname_row', 'lastname_row', 'lastupdate_row']
+
+	      	for (x in jsonObj) {
+	      		var newRow = tableRef.insertRow(-1);
+	      		newRow.setAttribute('id', 'row'+id)
+	      		var i = 0;
+	      		for (y in jsonObj[x]) {
+	      			newCell = newRow.insertCell(i);
+		      		newText = jsonObj[x][y];
+		      		newCell.append(newText);
+		      		newCell.setAttribute('id', columns[i]+id)
+		      		i++;
+	      		}
+	      		newCell = newRow.insertCell(i);
+	      		createButtonEntry(newCell, id);
+	      		id++;
+	      	}
+	      	createLastRow(tableRef);
+	      	document.body.appendChild(tableRef);
+	      	
+	      } else {
+	        alert('There was a problem with the request.');
+	      }
+	    }
+	  }
+
+	})();
+	</script>
+
+
+</body>
+</html>
